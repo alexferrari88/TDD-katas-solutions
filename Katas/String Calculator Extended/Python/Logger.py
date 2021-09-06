@@ -11,4 +11,5 @@ class ILogger(ABC):
 
 class Logger(ILogger):
     def write(self, content: int) -> None:
-        print(content)
+        # print(content)
+        pass

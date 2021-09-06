@@ -32,6 +32,7 @@ class StringCalculator:
         numbers_array = []
         if not numbers:
             self.log(0)
+            print(0)
             return 0
 
         # default separators
@@ -61,6 +62,7 @@ class StringCalculator:
 
         sum_to_return = sum(int(n) for n in numbers_array if int(n) <= 1000)
         self.log(sum_to_return)
+        print(sum_to_return)
 
         return sum_to_return
 

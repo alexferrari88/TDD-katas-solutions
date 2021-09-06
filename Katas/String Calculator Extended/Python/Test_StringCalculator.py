@@ -65,3 +65,8 @@ class TestStringCalculator:
 
         web_service.notify.assert_called()
         assert ERROR_MSG in str(web_service.notify.call_args[0])
+
+    def test_should_print_output_in_console(self, capsys):
+        want = self.string_calculator.add("//[*][%]\n1*2%3")
+        got = capsys.readouterr()
+        assert got.out == str(want) + "\n"
