@@ -14,6 +14,7 @@ class StringCalculator:
         separators = ["\n", ","]
 
         custom_separator = re.findall(r"^//(.+)\n", numbers)
+
         if custom_separator and (
             multiple_custom_separators := re.findall(r"(?<=\[).+?(?=\])", numbers)
         ):
@@ -23,11 +24,8 @@ class StringCalculator:
             separators = custom_separator
             numbers = numbers[numbers.index("\n") + 1 :]
 
-        if len(separators) > 1:
-            separator_pattern = self._make_separators_pattern(separators)
-            numbers_array = re.split(separator_pattern, numbers)
-        else:
-            numbers_array = numbers.split(*separators)
+        separator_pattern = self._make_separators_pattern(separators)
+        numbers_array = re.split(separator_pattern, numbers)
 
         negative_numbers = list(filter(lambda x: int(x) < 0, numbers_array))
         if negative_numbers:
@@ -36,4 +34,5 @@ class StringCalculator:
         return sum(int(n) for n in numbers_array if int(n) <= 1000)
 
     def _make_separators_pattern(self, separators: List[str]) -> str:
-        return f"[{'|'.join(separators)}]"
+        regex_ready_separators = [f"(?:{re.escape(sep)})" for sep in separators]
+        return "|".join(regex_ready_separators)
