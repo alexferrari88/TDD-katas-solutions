@@ -35,13 +35,5 @@ class StringCalculator:
             raise Error(f"negatives not allowed: {negative_numbers_string}")
         return sum(int(n) for n in numbers_array if int(n) <= 1000)
 
-    def _split_numbers(self, numbers: str, separators: List[str]) -> List[str]:
-        if not separators:
-            return numbers
-        sep = separators.pop()
-        for num in numbers:
-            num = num.split(sep)
-        return self._split_numbers(numbers, separators)
-
     def _make_separators_pattern(self, separators: List[str]) -> str:
         return f"[{'|'.join(separators)}]"
