@@ -1,4 +1,6 @@
-﻿import re
+﻿# Solution for the TDD-Kata https://osherove.com/tdd-kata-1
+
+import re
 from typing import List
 
 
@@ -8,11 +10,27 @@ class Error(Exception):
 
 class StringCalculator:
     def add(self, numbers: str) -> int:
+        """Given a string of separated numbers, returns its sum.
+        The numbers can be separated by comma, new-line, or custom(s) delimiters.
+        When using custom delimiter(s), pass them at the beginning of the numbers parameters.
+        Custom delimiter(s) format:
+        //[delimiter]\n
+
+        e.g. if you want to use $$$ as delimiter, then pass this parameter:
+        //[$$$]\n1$$$2$$$3      # will return 6
+
+        You can use multiple custom delimiters and these can be of any length.
+        e.g. //[***][%%%]\n1***2%%%3    # will return 6
+        """
+
         numbers_array = []
         if not numbers:
             return 0
+
+        # default separators
         separators = ["\n", ","]
 
+        # check if custom separator(s) are provided
         custom_separator = re.findall(r"^//(.+)\n", numbers)
 
         if custom_separator and (
@@ -21,6 +39,8 @@ class StringCalculator:
             separators = multiple_custom_separators
             numbers = numbers[numbers.index("\n") + 1 :]
         elif custom_separator:
+            # it is possible to pass a single custom separator without brackets
+            # (see specs for the Kata)
             separators = custom_separator
             numbers = numbers[numbers.index("\n") + 1 :]
 
@@ -31,8 +51,10 @@ class StringCalculator:
         if negative_numbers:
             negative_numbers_string = ",".join(negative_numbers)
             raise Error(f"negatives not allowed: {negative_numbers_string}")
+
         return sum(int(n) for n in numbers_array if int(n) <= 1000)
 
     def _make_separators_pattern(self, separators: List[str]) -> str:
+        """Private method that creates a regex pattern for separators"""
         regex_ready_separators = [f"(?:{re.escape(sep)})" for sep in separators]
         return "|".join(regex_ready_separators)
