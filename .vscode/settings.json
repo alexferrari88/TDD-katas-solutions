@@ -1,5 +1,5 @@
 {
-  "python.testing.pytestArgs": ["Katas\\String Calculator Extended\\Python"],
+  "python.testing.pytestArgs": ["Katas\\Password Verification\\Python"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
 }
