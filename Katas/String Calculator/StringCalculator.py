@@ -12,14 +12,22 @@ class StringCalculator:
         if not numbers:
             return 0
         separators = ["\n", ","]
-        custom_delimiter_pattern = re.findall(r"//\[?(.*[^\[\]])+\]?\n", numbers)
-        if custom_delimiter_pattern:
-            separators = re.findall(r"(?<=\[).+?(?=\])", numbers)
+
+        custom_separator = re.findall(r"^//(.+)\n", numbers)
+        if custom_separator and (
+            multiple_custom_separators := re.findall(r"(?<=\[).+?(?=\])", numbers)
+        ):
+            separators = multiple_custom_separators
+            numbers = numbers[numbers.index("\n") + 1 :]
+        elif custom_separator:
+            separators = custom_separator
             numbers = numbers[numbers.index("\n") + 1 :]
 
-        separator_pattern = self._make_separators_pattern(separators)
-        numbers_array = re.split(separator_pattern, numbers)
-        print(separator_pattern, numbers_array)
+        if len(separators) > 1:
+            separator_pattern = self._make_separators_pattern(separators)
+            numbers_array = re.split(separator_pattern, numbers)
+        else:
+            numbers_array = numbers.split(*separators)
 
         negative_numbers = list(filter(lambda x: int(x) < 0, numbers_array))
         if negative_numbers:
