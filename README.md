@@ -10,3 +10,5 @@ The primary programming language is Python but, as I'm also learning Go, you mig
   - [Go (incomplete)](https://github.com/alexferrari88/TDD-katas-solutions/tree/master/Katas/String%20Calculator/Go)
 - String Calculator (extended)
   - [Python](https://github.com/alexferrari88/TDD-katas-solutions/tree/master/Katas/String%20Calculator%20Extended/Python)
+- Password Verification
+  - [Python](https://github.com/alexferrari88/TDD-katas-solutions/tree/master/Katas/Password%20Verification/Python)
