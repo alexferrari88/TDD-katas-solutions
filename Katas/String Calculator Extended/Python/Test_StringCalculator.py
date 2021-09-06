@@ -1,11 +1,13 @@
 ﻿import pytest
 from .StringCalculator import StringCalculator, Error
 from .Logger import Logger
+from .Webservice import Webservice
 
 
 class TestStringCalculator:
     logger = Logger()
-    string_calculator = StringCalculator(logger)
+    web_service = Webservice()
+    string_calculator = StringCalculator(logger, web_service)
 
     def test_should_return_0_for_empty_string(self):
         assert self.string_calculator.add("") == 0
@@ -48,7 +50,18 @@ class TestStringCalculator:
 
     def test_should_use_the_logger(self, mocker):
         logger = mocker.Mock()
-        string_calculator_logger = StringCalculator(logger)
+        string_calculator_logger = StringCalculator(logger, Webservice())
         _ = string_calculator_logger.add("//[*][%]\n1*2%3")
         logger.write.assert_called()
         logger.write.assert_called_with(6)
+
+    def test_logger_exception_should_notify_web_service(self, mocker):
+        ERROR_MSG = "An error occurred"
+        logger = mocker.Mock()
+        logger.write.side_effect = Exception(ERROR_MSG)
+        web_service = mocker.Mock()
+        string_calculator = StringCalculator(logger, web_service)
+        _ = string_calculator.add("//[*][%]\n1*2%3")
+
+        web_service.notify.assert_called()
+        assert ERROR_MSG in str(web_service.notify.call_args[0])

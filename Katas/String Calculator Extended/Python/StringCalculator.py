@@ -3,6 +3,7 @@
 import re
 from typing import List
 from .Logger import Logger
+from .Webservice import Webservice
 
 
 class Error(Exception):
@@ -10,8 +11,9 @@ class Error(Exception):
 
 
 class StringCalculator:
-    def __init__(self, logger: Logger) -> None:
+    def __init__(self, logger: Logger, web_service: Webservice) -> None:
         self.logger = logger
+        self.web_service = web_service
 
     def add(self, numbers: str) -> None:
         """Given a string of separated numbers, returns its sum.
@@ -29,7 +31,7 @@ class StringCalculator:
 
         numbers_array = []
         if not numbers:
-            self.logger.write(0)
+            self.log(0)
             return 0
 
         # default separators
@@ -58,9 +60,15 @@ class StringCalculator:
             raise Error(f"negatives not allowed: {negative_numbers_string}")
 
         sum_to_return = sum(int(n) for n in numbers_array if int(n) <= 1000)
-        self.logger.write(sum_to_return)
+        self.log(sum_to_return)
 
         return sum_to_return
+
+    def log(self, content: str):
+        try:
+            self.logger.write(content)
+        except Exception as err:
+            self.web_service.notify(f"Logging has failed with error: {err}")
 
     def _make_separators_pattern(self, separators: List[str]) -> str:
         """Private method that creates a regex pattern for separators"""
