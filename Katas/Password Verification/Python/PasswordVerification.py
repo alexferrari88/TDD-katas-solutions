@@ -20,19 +20,19 @@ class PasswordVerification:
     def verify(self, pwd: str) -> bool:
         MIN_RULES_TO_PASS = 3
         rules = [
-            self.Rule(len(pwd) >= 8, "password should be longer than 8 characters"),
-            self.Rule(
-                bool(re.search(r"[A-Z]", pwd)),
-                "password should have one uppercase letter at least",
-            ),
             self.Rule(
                 bool(re.search(r"[a-z]", pwd)),
                 "password should have one lowercase letter at least",
                 True,
             ),
             self.Rule(
+                bool(re.search(r"[A-Z]", pwd)),
+                "password should have one uppercase letter at least",
+            ),
+            self.Rule(
                 bool(re.search(r"\d", pwd)), "password should have one number at least"
             ),
+            self.Rule(len(pwd) >= 8, "password should be longer than 8 characters"),
         ]
 
         if not pwd:
