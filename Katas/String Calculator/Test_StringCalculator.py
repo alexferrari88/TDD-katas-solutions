@@ -38,3 +38,8 @@ class TestStringCalculator:
 
     def test_should_return_number_sum_with_multiple_custom_delimiters(self):
         assert self.string_calculator.add("//[*][%]\n1*2%3") == 6
+
+    def test_should_return_number_sum_with_multiple_custom_delimiters_longer_than_1_char(
+        self,
+    ):
+        assert self.string_calculator.add("//[***][%%%]\n1***2%%%3") == 6
