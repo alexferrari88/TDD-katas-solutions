@@ -1,5 +1,5 @@
 {
-  "python.testing.pytestArgs": ["Katas\\Password Verification\\Python"],
+  "python.testing.pytestArgs": ["Katas\\Binary Chop\\Python"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
 }
