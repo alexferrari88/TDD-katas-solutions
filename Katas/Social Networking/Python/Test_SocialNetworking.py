@@ -72,3 +72,16 @@ class TestSocialNetworking:
                 "5 minutes ago",
             ],
         )
+
+    def test_should_user_subscribe_to_other_users_timelines(self, capsys):
+        user = self.sn.get_or_create_user("Charlie")
+        user.post("I'm in New York today! Anyone wants to have a coffee?")
+        user.follow(self.sn.get_or_create_user("Alice"))
+        user.display_wall()
+        self.assert_in_print(
+            capsys,
+            [
+                "Charlie - I'm in New York today! Anyone wants to have a coffee?",
+                "Alice - I love the weather today",
+            ],
+        )
