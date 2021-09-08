@@ -28,6 +28,9 @@ class TestSocialNetworking:
     def test_should_user_read_timeline_multiple_posts(self, capsys):
         user = self.sn.get_or_create_user("Bob")
         user.post("Damn! We lost!")
+        # needed because user can't submit at
+        # the exact same time two different messages
+        time.sleep(0.05)
         user.post("Good game though.")
         user.get_timeline()
         self.assert_in_print(capsys, ["Damn! We lost!", "Good game though."])
@@ -73,7 +76,7 @@ class TestSocialNetworking:
             ],
         )
 
-    def test_should_user_subscribe_to_other_users_timelines(self, capsys):
+    def test_should_user_subscribe_to_1_other_user_timelines(self, capsys):
         user = self.sn.get_or_create_user("Charlie")
         user.post("I'm in New York today! Anyone wants to have a coffee?")
         user.follow(self.sn.get_or_create_user("Alice"))
@@ -83,5 +86,20 @@ class TestSocialNetworking:
             [
                 "Charlie - I'm in New York today! Anyone wants to have a coffee?",
                 "Alice - I love the weather today",
+            ],
+        )
+
+    def test_should_user_subscribe_to_multiple_users_timelines(self, capsys):
+        user = self.sn.get_or_create_user("Charlie")
+        user.follow(self.sn.get_or_create_user("Alice"))
+        user.follow(self.sn.get_or_create_user("Bob"))
+        user.display_wall()
+        self.assert_in_print(
+            capsys,
+            [
+                "Charlie - I'm in New York today! Anyone wants to have a coffee?",
+                "Alice - I love the weather today",
+                "Bob - Good game though.",
+                "Bob - Damn! We lost!",
             ],
         )
