@@ -1,4 +1,5 @@
-﻿from .SocialNetworking import SocialNetworking, NO_POSTS, USER_NOT_EXIST
+﻿from typing import List
+from .SocialNetworking import SocialNetworking, User, NO_POSTS, USER_NOT_EXIST
 import time
 
 
@@ -14,24 +15,27 @@ class TestSocialNetworking:
         for want in wants:
             assert want in out
 
-    def test_should_post_to_timeline(self, capsys):
-        self.sn.post("Alice", "I love the weather today")
+    def test_should_user_post_to_own_timeline(self, capsys):
+        user = self.sn.get_or_create_user("Alice")
+        user.post("I love the weather today")
         self.assert_print_equals(capsys, "Alice -> I love the weather today")
 
     def test_should_user_read_timeline_single_post(self, capsys):
-        self.sn.read("Alice")
+        user_to_check = self.sn.get_or_create_user("Alice")
+        user_to_check.get_timeline()
         self.assert_in_print(capsys, ["I love the weather today"])
 
-    def test_should_return_USER_NOT_EXIST_when_read_for_unknown_user(self, capsys):
-        sn = SocialNetworking()
-        test_user = "John"
-        sn.read(test_user)
-        self.assert_print_equals(capsys, USER_NOT_EXIST.format(test_user))
-
     def test_should_user_read_timeline_multiple_posts(self, capsys):
-        self.sn.post("Bob", "Damn! We lost!")
-        self.sn.post("Bob", "Good game though.")
+        user = self.sn.get_or_create_user("Bob")
+        user.post("Damn! We lost!")
+        user.post("Good game though.")
+        user.get_timeline()
         self.assert_in_print(capsys, ["Damn! We lost!", "Good game though."])
+
+    def test_should_user_with_no_posts_show_NO_POSTS(self, capsys):
+        user = self.sn.get_or_create_user("John")
+        user.get_timeline()
+        self.assert_print_equals(capsys, NO_POSTS.format(user.name))
 
     def test_should_time_reported_be_right(self, capsys, monkeypatch):
         # it would have been better to break this in more tests
@@ -43,19 +47,21 @@ class TestSocialNetworking:
         test_user = "John"
         from .SocialNetworking import Entry
 
-        timeline_stub = {
-            test_user: [
-                Entry("Test msg 1", time.time() - ONE_SECOND),
-                Entry("Test msg 2", time.time() - TWO_SECONDS),
-                Entry("Test msg 3", time.time() - ONE_MINUTE),
-                Entry("Test msg 4", time.time() - SHOULD_BE_THREE_MINUTES),
-                Entry("Test msg 5", time.time() - FIVE_MINUTES),
-            ]
-        }
+        timeline_stub = [
+            Entry("Test msg 1", time.time() - ONE_SECOND),
+            Entry("Test msg 2", time.time() - TWO_SECONDS),
+            Entry("Test msg 3", time.time() - ONE_MINUTE),
+            Entry("Test msg 4", time.time() - SHOULD_BE_THREE_MINUTES),
+            Entry("Test msg 5", time.time() - FIVE_MINUTES),
+        ]
 
-        sn = SocialNetworking()
-        monkeypatch.setattr(sn, "timeline", timeline_stub)
-        sn.read(test_user)
+        class StubUser(User):
+            def __init__(self, name: str, timeline: List[Entry]) -> None:
+                super().__init__(name)
+                self.timeline = timeline
+
+        user = StubUser(test_user, timeline_stub)
+        user.get_timeline()
         self.assert_in_print(
             capsys,
             [
@@ -64,17 +70,5 @@ class TestSocialNetworking:
                 "1 minute ago",
                 "3 minutes ago",
                 "5 minutes ago",
-            ],
-        )
-
-    def test_should_user_subscribe_to_other_users_timelines(self, capsys):
-        self.sn.post("Charlie", "I'm in New York today! Anyone wants to have a coffee?")
-        self.sn.follow("Charlie", "Alice")
-        self.sn.wall("Charlie")
-        self.assert_in_print(
-            capsys,
-            [
-                "Charlie - I'm in New York today! Anyone wants to have a coffee?",
-                "Alice - I love the weather today",
             ],
         )

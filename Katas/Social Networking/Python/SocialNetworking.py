@@ -1,8 +1,7 @@
-﻿from datetime import datetime
-import dateutil.relativedelta
+﻿from .utils import *
 import time
 
-NO_POSTS = "There are currently no posts on this timeline."
+NO_POSTS = "{} has currently no posts."
 USER_NOT_EXIST = "User {} does not exist"
 
 
@@ -13,31 +12,28 @@ class Entry:
 
 
 class SocialNetworking:
-    timeline = {}
+    def __init__(self) -> None:
+        self.users = {}
 
-    def _get_human_timestamp(self, timestamp: float) -> str:
-        delta = int(time.time() - timestamp)
-        plural = "s" if 1 < delta < 60 or delta > 60 else ""
-        time_name = "second" if 0 <= delta < 60 else "minute"
-        if delta >= 60:
-            delta //= 60
-        return f"{delta} {time_name}{plural} ago"
+    def get_or_create_user(self, name: str) -> None:
+        if name not in self.users:
+            self.users[name] = User(name)
+        return self.users[name]
 
-    def post(self, user: str, message: str) -> None:
-        self.timeline.setdefault(user, []).append(Entry(msg=message, when=time.time()))
-        print(f"{user} -> {message}")
 
-    def read(self, user: str) -> None:
-        posts = self.timeline.get(user, [])
-        if not posts:
-            print(USER_NOT_EXIST.format(user))
+class User:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.timeline = []
+
+    def post(self, msg: str) -> None:
+        self.timeline.append(Entry(msg, time.time()))
+        print(f"{self.name} -> {msg}")
+
+    def get_timeline(self) -> None:
+        if not self.timeline:
+            print(NO_POSTS.format(self.name))
             return
-        for post in posts:
-            human_timestamp = self._get_human_timestamp(post.when)
+        for post in self.timeline:
+            human_timestamp = get_human_timestamp(post.when)
             print(f"{post.msg} ({human_timestamp})")
-
-    def follow(self, subject, recipient):
-        pass
-
-    def wall(self, user):
-        pass
