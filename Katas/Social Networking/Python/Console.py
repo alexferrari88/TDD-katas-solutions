@@ -1,7 +1,7 @@
-﻿from .IOutput import IOutput
+﻿from .IOOutput import IOOutput
 
 
-class Console(IOutput):
+class Console(IOOutput):
     def write(self, content: str) -> None:
         print(content)
 

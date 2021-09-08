@@ -1,6 +1,8 @@
-﻿from typing import List, Set
+﻿from typing import List, Optional, Set
 from .utils import *
 import time
+from .IOOutput import IOOutput
+from .Console import Console
 
 NO_POSTS = "{} has currently no posts."
 USER_NOT_EXIST = "User {} does not exist"
@@ -13,32 +15,34 @@ class Entry:
 
 
 class SocialNetworking:
-    def __init__(self) -> None:
+    def __init__(self, IO: Optional[IOOutput] = Console) -> None:
         self.users = {}
+        self.IO = IO
 
     def get_or_create_user(self, name: str) -> None:
         if name not in self.users:
-            self.users[name] = User(name)
+            self.users[name] = User(name, self.IO)
         return self.users[name]
 
 
 class User:
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, IO: Optional[IOOutput] = Console) -> None:
         self.name: str = name
         self.timeline: List[Entry] = []
         self.following: Set[User] = set()
+        self.IO = IO
 
     def post(self, msg: str) -> None:
         self.timeline.append(Entry(msg, time.time()))
-        print(f"{self.name} -> {msg}")
+        self.IO.write(f"{self.name} -> {msg}")
 
     def get_timeline(self) -> None:
         if not self.timeline:
-            print(NO_POSTS.format(self.name))
+            self.IO.write(NO_POSTS.format(self.name))
             return
         for post in self.timeline:
             human_timestamp = get_human_timestamp(post.when)
-            print(f"{post.msg} ({human_timestamp})")
+            self.IO.write(f"{post.msg} ({human_timestamp})")
 
     def follow(self, who) -> None:
         self.following.add(who)
@@ -53,4 +57,4 @@ class User:
         for wall_entry in reversed(sorted(timelines.items())):
             timestamp, user_name = wall_entry[0].split("__")
             human_timestamp = get_human_timestamp(float(timestamp))
-            print(f"{user_name} - {wall_entry[1]} ({human_timestamp})")
+            self.IO.write(f"{user_name} - {wall_entry[1]} ({human_timestamp})")
