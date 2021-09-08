@@ -15,6 +15,14 @@ class Entry:
 class SocialNetworking:
     timeline = {}
 
+    def _get_human_timestamp(self, timestamp: float) -> str:
+        delta = int(time.time() - timestamp)
+        plural = "s" if 1 < delta < 60 or delta > 60 else ""
+        time_name = "second" if 0 <= delta < 60 else "minute"
+        if delta >= 60:
+            delta //= 60
+        return f"{delta} {time_name}{plural} ago"
+
     def post(self, user: str, message: str) -> None:
         self.timeline.setdefault(user, []).append(Entry(msg=message, when=time.time()))
         print(f"{user} -> {message}")
@@ -25,9 +33,11 @@ class SocialNetworking:
             print(USER_NOT_EXIST.format(user))
             return
         for post in posts:
-            delta = int(time.time() - post.when)
-            plural = "s" if 1 < delta < 60 or delta > 60 else ""
-            time_name = "second" if 0 <= delta < 60 else "minute"
-            if delta >= 60:
-                delta //= 60
-            print(f"{post.msg} ({delta} {time_name}{plural} ago)")
+            human_timestamp = self._get_human_timestamp(post.when)
+            print(f"{post.msg} ({human_timestamp})")
+
+    def follow(self, subject, recipient):
+        pass
+
+    def wall(self, user):
+        pass

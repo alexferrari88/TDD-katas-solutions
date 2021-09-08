@@ -34,6 +34,7 @@ class TestSocialNetworking:
         self.assert_in_print(capsys, ["Damn! We lost!", "Good game though."])
 
     def test_should_time_reported_be_right(self, capsys, monkeypatch):
+        # it would have been better to break this in more tests
         FIVE_MINUTES = 5 * 60
         ONE_MINUTE = 60
         TWO_SECONDS = 2
@@ -63,5 +64,17 @@ class TestSocialNetworking:
                 "1 minute ago",
                 "3 minutes ago",
                 "5 minutes ago",
+            ],
+        )
+
+    def test_should_user_subscribe_to_other_users_timelines(self, capsys):
+        self.sn.post("Charlie", "I'm in New York today! Anyone wants to have a coffee?")
+        self.sn.follow("Charlie", "Alice")
+        self.sn.wall("Charlie")
+        self.assert_in_print(
+            capsys,
+            [
+                "Charlie - I'm in New York today! Anyone wants to have a coffee?",
+                "Alice - I love the weather today",
             ],
         )
