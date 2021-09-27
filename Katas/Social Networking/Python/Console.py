@@ -1,4 +1,4 @@
-﻿from .IOOutput import IOOutput
+﻿from IOOutput import IOOutput
 
 
 class Console(IOOutput):

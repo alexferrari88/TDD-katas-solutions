@@ -1,11 +1,21 @@
-﻿from typing import List, Optional, Set
-from .utils import *
+﻿# https://github.com/sandromancuso/social_networking_kata
+from typing import List, Optional, Set
+from utils import *
 import time
-from .IOOutput import IOOutput
-from .Console import Console
+from IOOutput import IOOutput
+from Console import Console
 
 NO_POSTS = "{} has currently no posts."
 USER_NOT_EXIST = "User {} does not exist"
+HELP_MSG_TEXT = "Welcome to CLIbook!🌎\n"
+COMMANDS_TEXT = (
+    "Enter any of these commands:\n"
+    + "Post as user: \t\t\t\t<username> -> <message>\n"
+    + "Check a user's timeline😎: \t\tvisit <username>\n"
+    + "Follow another user🤗: \t\t\tfollow <your username> <username to follow>\n"
+    + "Check user's wall📃: \t\t\twall <username>\n"
+    + "Get this help message again🆘: \t\thelp\n"
+)
 
 
 class Entry:
@@ -46,6 +56,7 @@ class User:
 
     def follow(self, who) -> None:
         self.following.add(who)
+        self.IO.write(f"{self.name} is now following {who.name}🤗")
 
     def display_wall(self) -> None:
         timelines = {f"{entry.when}__{self.name}": entry.msg for entry in self.timeline}
@@ -58,3 +69,34 @@ class User:
             timestamp, user_name = wall_entry[0].split("__")
             human_timestamp = get_human_timestamp(float(timestamp))
             self.IO.write(f"{user_name} - {wall_entry[1]} ({human_timestamp})")
+
+
+def main():
+    console = Console()
+    sn = SocialNetworking(console)
+    command = ""
+    console.write(HELP_MSG_TEXT)
+
+    console.write(COMMANDS_TEXT)
+
+    while command != "exit":
+        command = input()
+        if "->" in command:
+            username, msg = command.split("->")
+            username = username.strip()
+            msg = msg.strip()
+            sn.get_or_create_user(username).post(msg)
+        elif command[:5].lower() == "visit":
+            username = command[6:]
+            sn.get_or_create_user(username).get_timeline()
+        elif command[:6].lower() == "follow":
+            follower_name, followee_name = command[7:].split(" ")
+            followee_name.strip()
+            follower_name.strip()
+            follower = sn.get_or_create_user(follower_name)
+            followee = sn.get_or_create_user(followee_name)
+            follower.follow(followee)
+
+
+if __name__ == "__main__":
+    main()
